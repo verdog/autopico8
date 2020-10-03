@@ -3,6 +3,24 @@ import numpy as np
 from Xlib import display, X
 from PIL import ImageGrab, Image
 
+# these are in BGR format
+COLOR_0 = (0, 0, 0)
+COLOR_1 = (83, 43, 29)
+COLOR_2 = (83, 37, 126)
+COLOR_3 = (81, 135, 0)
+COLOR_4 = (54, 82, 171)
+COLOR_5 = (79, 87, 95)
+COLOR_6 = (199, 195, 194)
+COLOR_7 = (232, 241, 255)
+COLOR_8 = (77, 0, 255)
+COLOR_9 = (0, 163, 255)
+COLOR_A = (39, 236, 255)
+COLOR_B = (54, 228, 0)
+COLOR_C = (255, 173, 41)
+COLOR_D = (156, 118, 131)
+COLOR_E = (168, 119, 255)
+COLOR_F = (170, 204, 255)
+
 # find the pico8 x window
 def find_pico8():
     print("Trying to find pico8...")

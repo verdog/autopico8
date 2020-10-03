@@ -3,6 +3,8 @@ import Xlib
 from Xlib import X
 import Xlib.XK
 
+import time
+
 display = None
 root = None
 window = None
@@ -27,8 +29,9 @@ def press_key(key):
     shift_mask = 0 # or Xlib.X.ShiftMask
     keysym = Xlib.XK.string_to_keysym(key)
     keycode = display.keysym_to_keycode(keysym)
+
     event = Xlib.protocol.event.KeyPress(
-        time = X.CurrentTime,
+        time = 0,
         root = root,
         window = window,
         same_screen = 0, child = Xlib.X.NONE,
@@ -37,8 +40,9 @@ def press_key(key):
         detail = keycode
         )
     window.send_event(event, propagate = True)
+
     event = Xlib.protocol.event.KeyRelease(
-        time = X.CurrentTime,
+        time = 0,
         root = root,
         window = window,
         same_screen = 0, child = Xlib.X.NONE,
