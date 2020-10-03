@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 
 import screen as Screen
+import ui as Ui
 import cv2
 
 w = Screen.find_pico8()
+Ui.set_window(w)
 
 if not w:
     print("Couldn't find pico-8. Is it open?")
