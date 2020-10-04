@@ -41,7 +41,10 @@ def find_walls(scr, color, width, height):
     while x < 64 + width//2:
         if mask[height][x] == 255:
             idx = (x - (64 - width//2))/width*5
-            results[math.floor(idx)] = True
+
+            # don't take edge cases
+            if abs(idx - round(idx)) > .05:
+                results[math.floor(idx)] = True
         x += 1
 
     # results
@@ -89,7 +92,7 @@ def move(current_slot, walls):
     # find desired lane
     longest = 0
     lane = 2
-    for i in [2, 3, 4, 0, 1]:
+    for i in [2, 1, 3, 0, 4]:
         # ordering above to prefer middle
         if paths[i] > longest:
             lane = i
@@ -129,9 +132,9 @@ while True:
     walls_2 = find_walls(screen, Screen.COLOR_9, 80, 30)
     walls_3 = find_walls(screen, Screen.COLOR_4, 76, 36)
     walls_4 = find_walls(screen, Screen.COLOR_5, 68, 40)
-    # walls_5 = find_walls(screen, Screen.COLOR_1, 60, 46)
+    walls_5 = find_walls(screen, Screen.COLOR_1, 60, 46)
 
-    lane = move(current_slot, [walls_0, walls_1, walls_2, walls_3, walls_4])
+    lane = move(current_slot, [walls_0, walls_1, walls_2, walls_3, walls_4, walls_5])
 
     # player
     cv2.circle(viz, (math.floor(current_slot*128/5 + 12), 90), 4, (255, 0, 255), 2)
