@@ -35,7 +35,7 @@ def find_walls(scr, color, width, height):
     # scan line
     cv2.line(viz, (64 - width//2, height), (64 + width//2, height), (255, 0, 255), 1)
     
-    cv2.imshow("mask_" + str(color), mask)
+    # cv2.imshow("mask_" + str(color), mask)
 
     x = 64 - width//2
     while x < 64 + width//2:
@@ -142,7 +142,7 @@ while True:
     cv2.imshow("viz", cv2.resize(viz, (512, 512), None, 0, 0, cv2.INTER_NEAREST))
 
     # 30 fps
-    if cv2.waitKey(1000//120) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cv2.destroyAllWindows()
