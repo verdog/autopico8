@@ -55,37 +55,58 @@ def find_walls(scr, color, width, height):
     return results
 
 def move(current_slot, walls):
-    if walls[1][current_slot]:
-        # todo: more sophisticated ai...
-        d = current_slot - 2
-        if d >= 0:
-            if not walls[0][mid(0, current_slot-1, 4)]:
-                Ui.press_key("Left")
-                Ui.release_key("Right")
-            else:
-                Ui.press_key("Right")
-                Ui.release_key("Left")
-        else:
-            if not walls[0][mid(0, current_slot+1, 4)]:
-                Ui.press_key("Right")
-                Ui.release_key("Left")
-            else:
-                Ui.press_key("Left")
-                Ui.release_key("Right")
-    else:
-        Ui.release_key("Right")
+    # find lane with longest forward path
+    paths = [0, 0, 0, 0, 0]
+
+    for i in range(5):
+        count = 0
+        layer = 0
+        while layer < len(walls) and not walls[layer][i]:
+            layer += 1
+            count += 1
+        paths[i] = count
+    
+    # block out lanes we can't get to
+    # block out going right
+    flag = False
+    for i in range(current_slot, 5):
+        if paths[i] == 0:
+            flag = True
+            # print("set flag right", i)
+        if flag:
+            paths[i] = 0
+    
+    flag = False
+    for i in range(current_slot, -1, -1):
+        if paths[i] == 0:
+            flag = True
+            # print("set flag left", i)
+        if flag:
+            paths[i] = 0
+
+    # print(paths)
+
+    # find desired lane
+    longest = 0
+    lane = 2
+    for i in [2, 3, 4, 0, 1]:
+        # ordering above to prefer middle
+        if paths[i] > longest:
+            lane = i
+            longest = paths[i]
+    
+    # move
+    if current_slot < lane:
+        Ui.press_key("Right")
         Ui.release_key("Left")
-        # try to go to middle
-        pass
-        # if current_slot < 2:
-        #     Ui.press_key("Right")
-        #     Ui.release_key("Left")
-        # elif current_slot > 2:
-        #     Ui.press_key("Left")
-        #     Ui.release_key("Right")
-        # else:
-        #     Ui.release_key("Right")
-        #     Ui.release_key("Left")
+    elif current_slot > lane:
+        Ui.press_key("Left")
+        Ui.release_key("Right")
+    else:
+        Ui.release_key("Left")
+        Ui.release_key("Right")
+
+    return lane
 
 w = Screen.find_pico8()
 Ui.set_window(w)
@@ -105,15 +126,23 @@ while True:
     # walls = find_walls(screen, Screen.COLOR_4, 72, 38)
     walls_0 = find_walls(screen, Screen.COLOR_F, 120, 20)
     walls_1 = find_walls(screen, Screen.COLOR_A, 100, 24)
+    walls_2 = find_walls(screen, Screen.COLOR_9, 80, 30)
+    walls_3 = find_walls(screen, Screen.COLOR_4, 76, 36)
+    walls_4 = find_walls(screen, Screen.COLOR_5, 68, 40)
+    # walls_5 = find_walls(screen, Screen.COLOR_1, 60, 46)
 
+    lane = move(current_slot, [walls_0, walls_1, walls_2, walls_3, walls_4])
+
+    # player
     cv2.circle(viz, (math.floor(current_slot*128/5 + 12), 90), 4, (255, 0, 255), 2)
+    # lane
+    cv2.circle(viz, (math.floor(lane*128/5 + 12), 110), 4, (0, 255, 255), 2)
+
     # cv2.imshow("screen", screen)
     cv2.imshow("viz", cv2.resize(viz, (512, 512), None, 0, 0, cv2.INTER_NEAREST))
 
-    move(current_slot, [walls_0, walls_1])
-
     # 30 fps
-    if cv2.waitKey(round(1000/30 - (time.time() - framestart))) & 0xFF == ord('q'):
+    if cv2.waitKey(1000//120) & 0xFF == ord('q'):
         break
 
 cv2.destroyAllWindows()
