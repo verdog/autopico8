@@ -1,53 +1,64 @@
-from Xlib.display import Display
-import Xlib
-from Xlib import X
-import Xlib.XK
+from Xlib import XK, display, ext, X, protocol
 
 import time
 
-display = None
-root = None
-window = None
+DISPLAY = None
+ROOT = None
+WINDOW = None
 
 def set_window(win):
-    global window
-    window = win
+    global WINDOW
+    WINDOW = win
 
 def ensure_ready():
-    global display
-    global root
-    if not display:
-        display = Display()
-    if not root:
-        root = display.screen().root
-    if not window:
+    global DISPLAY
+    global ROOT
+    if not DISPLAY:
+        print("Setting UI DISPLAY...")
+        DISPLAY = display.Display()
+    if not ROOT:
+        print("Setting UI ROOT...")
+        ROOT = DISPLAY.screen().root
+    if not WINDOW:
         print("error in UI! no window!")
 
 def press_key(key):
     ensure_ready()
 
-    shift_mask = 0 # or Xlib.X.ShiftMask
-    keysym = Xlib.XK.string_to_keysym(key)
-    keycode = display.keysym_to_keycode(keysym)
+    keysym = XK.string_to_keysym(key)
+    keycode = DISPLAY.keysym_to_keycode(keysym)
+    
+    # print("pressin", key, keysym, keycode)
 
-    event = Xlib.protocol.event.KeyPress(
-        time = 0,
-        root = root,
-        window = window,
-        same_screen = 0, child = Xlib.X.NONE,
+    event = protocol.event.KeyPress(
+        time = int(time.time()),
+        root = ROOT,
+        window = WINDOW,
+        same_screen = 0, child = X.NONE,
         root_x = 0, root_y = 0, event_x = 0, event_y = 0,
-        state = shift_mask,
+        state = 0,
         detail = keycode
         )
-    window.send_event(event, propagate = True)
+    DISPLAY.send_event(WINDOW, event, propagate = True)
+    DISPLAY.sync()
 
-    event = Xlib.protocol.event.KeyRelease(
-        time = 0,
-        root = root,
-        window = window,
-        same_screen = 0, child = Xlib.X.NONE,
+    # release_key(key)
+
+def release_key(key):
+    ensure_ready()
+
+    keysym = XK.string_to_keysym(key)
+    keycode = DISPLAY.keysym_to_keycode(keysym)
+
+    event = protocol.event.KeyRelease(
+        time = int(time.time()),
+        root = ROOT,
+        window = WINDOW,
+        same_screen = 0, child = X.NONE,
         root_x = 0, root_y = 0, event_x = 0, event_y = 0,
-        state = shift_mask,
+        state = 0,
         detail = keycode
         )
-    window.send_event(event, propagate = True)
+    DISPLAY.send_event(WINDOW, event, propagate = True)
+    DISPLAY.sync()
+

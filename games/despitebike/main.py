@@ -8,6 +8,7 @@ import ui as Ui
 import cv2
 import numpy as np
 import math
+import time
 
 char_template = cv2.imread("./character.png")
 viz = None
@@ -57,8 +58,13 @@ def move(current_slot, walls):
         # try to go to middle
         if current_slot < 2:
             Ui.press_key("Right")
+            Ui.release_key("Left")
         elif current_slot > 2:
             Ui.press_key("Left")
+            Ui.release_key("Right")
+        else:
+            Ui.release_key("Right")
+            Ui.release_key("Left")
 
 w = Screen.find_pico8()
 Ui.set_window(w)
@@ -68,6 +74,8 @@ if not w:
     exit(-1)
 
 while True:
+    framestart = time.time()
+
     screen = Screen.filter(Screen.get_screen(w))
     viz = screen.copy()
 
@@ -84,7 +92,7 @@ while True:
     move(current_slot, walls)
 
     # 30 fps
-    if cv2.waitKey(1000//30) & 0xFF == ord('q'):
+    if cv2.waitKey(round(1000/30 - (time.time() - framestart))) & 0xFF == ord('q'):
         break
 
 cv2.destroyAllWindows()
